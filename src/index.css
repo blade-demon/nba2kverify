@@ -3,3 +3,21 @@ body {
   height: 100%;
   font-family: Lato;
 }
+
+.Modal {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: transparent;
+}
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(252, 252, 252, 0.8);
+}
