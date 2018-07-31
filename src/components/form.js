@@ -141,12 +141,15 @@ class RegisterForm extends React.Component {
     this.state = {
       name: "",
       id: "",
+      psnid: "",
       openModal: false,
       checked: true,
       buttonDisabled: true,
       nameError: true,
       idError: true,
-      openloadingModal: false
+      psnIdError: true,
+      openloadingModal: false,
+      redirect: false
     };
   }
 
@@ -204,23 +207,44 @@ class RegisterForm extends React.Component {
       console.log(this.state.id);
     }
     this.canSubmit();
-    console.log(this.state.checked);
+  };
+
+  onChangePSNId = async e => {
+    const value = e.target.value;
+    if (value.length >= 3) {
+      await this.setState({
+        psnid: value,
+        psnIdError: false
+      });
+      console.log("psnId validate", this.state.psnIdError);
+    } else {
+      await this.setState({
+        psnid: value,
+        psnIdError: true
+      });
+    }
+    this.canSubmit();
   };
 
   isCardNo = id =>
     /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(id) ? true : false;
 
   canSubmit = () =>
-    !this.state.idError && !this.state.nameError && this.state.checked
+    !this.state.idError &&
+    !this.state.nameError &&
+    !this.state.psnIdError &&
+    this.state.checked
       ? this.setState({ buttonDisabled: false })
       : this.setState({ buttonDisabled: true });
 
   submit = async () => {
     console.log("提交");
-    console.log("");
+
     this.setState({ openloadingModal: true });
     await setTimeout(() => {
       this.setState({ openloadingModal: false });
+      const search = window.location.search;
+      window.location = "https://www.nba2k.com/accountverify" + search;
     }, 3000);
   };
 
@@ -240,7 +264,7 @@ class RegisterForm extends React.Component {
               <MediaQuery query="(max-device-width: 1024px)">
                 <Typography variant="title" className={classes.flex}>
                   <img
-                    src="https://cdn.2kgames.com/web/nba.2k.com/images/nba2k19_logo_L_2.png"
+                    src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/nba2k19_logo_L_2.png"
                     style={{
                       margin: "1rem auto",
                       padding: "1rem",
@@ -253,7 +277,7 @@ class RegisterForm extends React.Component {
               <MediaQuery query="(min-device-width: 1024px)">
                 <Typography variant="title" className={classes.flex}>
                   <img
-                    src="https://cdn.2kgames.com/web/nba.2k.com/images/nba2k19_logo_L_2.png"
+                    src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/nba2k19_logo_L_2.png"
                     style={{ width: "200px" }}
                     alt=""
                   />
@@ -265,7 +289,7 @@ class RegisterForm extends React.Component {
                 >
                   <a
                     className={classes.link}
-                    href="http://wwww.gamepoch.com"
+                    href="http://www.gamepoch.com"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -322,7 +346,7 @@ class RegisterForm extends React.Component {
                       }}
                     />
                   </div>
-                  <p>验证成功, 3s后将自动跳转到2k网站</p>
+                  <p>验证成功, 跳转中</p>
                 </div>
               </MediaQuery>
               <MediaQuery query="(min-device-width: 1024px)">
@@ -344,12 +368,12 @@ class RegisterForm extends React.Component {
                       }}
                     />
                   </div>
-                  <p>验证成功, 3s后将自动跳转到2k网站</p>
+                  <p>验证成功, 跳转中</p>
                 </div>
               </MediaQuery>
             </ReactModal>
             <FormControl className={classes.formControl}>
-              <h1>实名认证</h1>
+              <h1>用户激活</h1>
               <Grid
                 container
                 spacing={16}
@@ -362,7 +386,7 @@ class RegisterForm extends React.Component {
                 <Grid item style={{ width: "80%" }}>
                   <MuiThemeProvider theme={theme}>
                     <TextField
-                      label="公民身份证姓名"
+                      label="姓名"
                       onChange={this.onChangeName}
                       error={this.state.nameError}
                       style={{ width: "100%" }}
@@ -370,6 +394,7 @@ class RegisterForm extends React.Component {
                   </MuiThemeProvider>
                 </Grid>
               </Grid>
+
               <Grid
                 container
                 spacing={16}
@@ -382,9 +407,34 @@ class RegisterForm extends React.Component {
                 <Grid item style={{ width: "80%" }}>
                   <MuiThemeProvider theme={theme}>
                     <TextField
-                      label="公民身份证号(15或者18位)"
+                      label="身份证号(15或者18位)"
                       onChange={this.onChangeId}
                       error={this.state.idError}
+                      style={{ width: "100%" }}
+                    />
+                  </MuiThemeProvider>
+                </Grid>
+              </Grid>
+
+              <Grid
+                container
+                spacing={16}
+                alignItems="flex-end"
+                className={classes.inputWrapper}
+              >
+                <Grid item>
+                  <img
+                    src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/icons8-playstation-filled-50.png"
+                    style={{ width: "24px", height: "24px" }}
+                    alt="PS4 logo"
+                  />
+                </Grid>
+                <Grid item style={{ width: "80%" }}>
+                  <MuiThemeProvider theme={theme}>
+                    <TextField
+                      label="PSNID"
+                      onChange={this.onChangePSNId}
+                      error={this.state.psnIdError}
                       style={{ width: "100%" }}
                     />
                   </MuiThemeProvider>
