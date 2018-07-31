@@ -240,12 +240,18 @@ class RegisterForm extends React.Component {
   submit = async () => {
     console.log("提交");
 
-    this.setState({ openloadingModal: true });
-    await setTimeout(() => {
-      this.setState({ openloadingModal: false });
+    if (window.location.search.substr(1, 1) !== "c") {
+      alert("暂未开放！");
+      return false;
+    } else {
       const search = window.location.search;
-      window.location = "https://www.nba2k.com/accountverify" + search;
-    }, 3000);
+      this.setState({ openloadingModal: true });
+      await setTimeout(() => {
+        this.setState({ openloadingModal: false });
+
+        window.location = "https://www.nba2k.com/accountverify" + search;
+      }, 3000);
+    }
   };
 
   render() {
