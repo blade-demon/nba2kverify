@@ -23,6 +23,8 @@ import MediaQuery from "react-responsive";
 import Modal from "./modal";
 import ReactLoading from "react-loading";
 import ReactModal from "react-modal";
+import urlDecode from "urldecode";
+import axios from "axios";
 
 const styles = theme => ({
   wrapper: {
@@ -176,12 +178,12 @@ class RegisterForm extends React.Component {
 
   onChangeName = async e => {
     const value = e.target.value;
-    if (value.length >= 3) {
+    if (value.trim().length >= 2 && value.trim().length < 8) {
       await this.setState({
         name: value,
         nameError: false
       });
-      console.log("name validate", this.state.nameError);
+      // console.log("name validate", this.state.nameError);
     } else {
       await this.setState({
         name: value,
@@ -189,34 +191,61 @@ class RegisterForm extends React.Component {
       });
     }
     this.canSubmit();
-    console.log(this.state.checked);
+    // console.log(this.state.checked);
   };
 
   onChangeId = async e => {
-    if (this.isCardNo(e.target.value)) {
+    if (e.target.value.trim().length < 15) {
       await this.setState({
         id: e.target.value,
-        idError: false
-      });
-      console.log("id validate", this.state.idError);
-    } else {
-      await this.setState({
-        id: "",
         idError: true
       });
-      console.log(this.state.id);
+    } else {
+      const birthday = e.target.value.substr(6, 8);
+      const year = Number(birthday.substr(0, 4));
+      const month = Number(birthday.substr(4, 2));
+      const day = Number(birthday.substr(6, 2));
+      // console.log(year + "" + month + "" + day);
+      if (
+        year > 2018 ||
+        year < 1900 ||
+        month < 0 ||
+        month > 12 ||
+        day < 0 ||
+        day > 31
+      ) {
+        await this.setState({
+          id: e.target.value,
+          idError: true
+        });
+        return;
+      }
+
+      if (this.isCardNo(e.target.value)) {
+        await this.setState({
+          id: e.target.value,
+          idError: false
+        });
+        // console.log("id validate", this.state.idError);
+      } else {
+        await this.setState({
+          id: "",
+          idError: true
+        });
+        // console.log(this.state.id);
+      }
+      this.canSubmit();
     }
-    this.canSubmit();
   };
 
   onChangePSNId = async e => {
-    const value = e.target.value;
+    const value = e.target.value.trim();
     if (value.length >= 3) {
       await this.setState({
         psnid: value,
         psnIdError: false
       });
-      console.log("psnId validate", this.state.psnIdError);
+      // console.log("psnId validate", this.state.psnIdError);
     } else {
       await this.setState({
         psnid: value,
@@ -238,20 +267,85 @@ class RegisterForm extends React.Component {
       : this.setState({ buttonDisabled: true });
 
   submit = async () => {
-    console.log("提交");
+    this.setState({ buttonDisabled: true });
+    const validateResult = await this.validatePSNId(this.state.psnid);
+    this.setState({ buttonDisabled: false });
+    console.log(validateResult);
+    if (validateResult !== 1) {
+      alert("PSNID不存在！");
+      return;
+    }
 
-    if (window.location.search.substr(1, 1) !== "c") {
-      alert("暂未开放！");
-      return false;
-    } else {
-      const search = window.location.search;
+    try {
+      const redirectURL = urlDecode(window.location.search.substr(14));
+      const index = redirectURL.indexOf("?");
+      const targetHostName = redirectURL.substr(0, index + 1);
+      const c = this.getParamsFromUrl(redirectURL).c;
+      let restricted = 1;
+      const birthday = this.state.id.substr(6, 8);
+      const year = birthday.substr(0, 4);
+      const month = birthday.substr(4, 2);
+      const day = birthday.substr(6, 2);
+      const birthdayTime = new Date(year, month, day).getTime();
+      const currentTime = new Date().getTime();
+
+      if ((currentTime - birthdayTime) / (3600 * 1000 * 24 * 365) > 18) {
+        restricted = 0;
+        // console.log("成年");
+      } else {
+        // console.log("未成年");
+      }
+
+      const key = "ed9e41b21de7d4635596254d8f9626d5";
+      // c = aaaaaaaa - bbbb - cccc - dddd - eeeeeeeeeeee & restricted=1 & key=ed9e41b21de7d4635596254d8f9626d5
+      // const targetURL = this.getParamsFromUrl(redirectURL);
+      // console.log(targetURL);
+      // console.log(urlDecode(targetURL));
+      // const params = this.getParamsFromUrl(urlDecode(targetURL));
+      // console.log(params);
+
       this.setState({ openloadingModal: true });
       await setTimeout(() => {
-        this.setState({ openloadingModal: false });
-
-        window.location = "https://www.nba2k.com/accountverify" + search;
+        // this.setState({ openloadingModal: false });
+        console.log(
+          `${targetHostName}${c}&restricted=${restricted}&key=${key}`
+        );
+        window.location = `${targetHostName}${c}&restricted=${restricted}&key=${key}`;
       }, 3000);
+    } catch (e) {
+      // console.log(e);
+      alert("请求非法！");
     }
+  };
+
+  getParamsFromUrl = url => {
+    url = decodeURI(url);
+    if (typeof url === "string") {
+      let params = url.split("?");
+      let eachParamsArr = params[1].split("&");
+      let obj = {};
+      if (eachParamsArr && eachParamsArr.length) {
+        eachParamsArr.map(param => {
+          let keyValuePair = param.split("=");
+          let key = keyValuePair[0];
+          let value = keyValuePair[1];
+          obj[key] = value;
+        });
+      }
+      return obj;
+    }
+  };
+
+  validatePSNId = async psnid => {
+    return new Promise((resolve, reject) => {
+      axios
+        .post("https://servicewechat.gamepoch.com/api/verifyPsOnlineId", {
+          onlineId: psnid,
+          reserveIfAvailable: false
+        })
+        .then(response => resolve(response.data))
+        .catch(e => reject(e));
+    });
   };
 
   render() {
@@ -352,7 +446,7 @@ class RegisterForm extends React.Component {
                       }}
                     />
                   </div>
-                  <p>验证成功, 跳转中</p>
+                  <p>验证中，请稍等</p>
                 </div>
               </MediaQuery>
               <MediaQuery query="(min-device-width: 1024px)">
@@ -374,7 +468,7 @@ class RegisterForm extends React.Component {
                       }}
                     />
                   </div>
-                  <p>验证成功, 跳转中</p>
+                  <p>验证中，请稍等</p>
                 </div>
               </MediaQuery>
             </ReactModal>
