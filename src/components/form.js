@@ -202,9 +202,9 @@ class RegisterForm extends React.Component {
       });
     } else {
       const birthday = e.target.value.substr(6, 8);
-      const year = Number(birthday.substr(0, 4));
-      const month = Number(birthday.substr(4, 2));
-      const day = Number(birthday.substr(6, 2));
+      const year = parseInt(birthday.substr(0, 4), 10);
+      const month = parseInt(birthday.substr(4, 2), 10);
+      const day = parseInt(birthday.substr(6, 2), 10);
       // console.log(year + "" + month + "" + day);
       if (
         year > 2018 ||
@@ -307,10 +307,10 @@ class RegisterForm extends React.Component {
       this.setState({ openloadingModal: true });
       await setTimeout(() => {
         // this.setState({ openloadingModal: false });
-        console.log(
-          `${targetHostName}${c}&restricted=${restricted}&key=${key}`
-        );
-        window.location = `${targetHostName}${c}&restricted=${restricted}&key=${key}`;
+        // console.log(
+        //   `${targetHostName}c=${c}&restricted=${restricted}&key=${key}`
+        // );
+        window.location = `${targetHostName}c=${c}&restricted=${restricted}&key=${key}`;
       }, 3000);
     } catch (e) {
       // console.log(e);
@@ -325,7 +325,7 @@ class RegisterForm extends React.Component {
       let eachParamsArr = params[1].split("&");
       let obj = {};
       if (eachParamsArr && eachParamsArr.length) {
-        eachParamsArr.map(param => {
+        eachParamsArr.forEach(param => {
           let keyValuePair = param.split("=");
           let key = keyValuePair[0];
           let value = keyValuePair[1];
@@ -336,8 +336,8 @@ class RegisterForm extends React.Component {
     }
   };
 
-  validatePSNId = async psnid => {
-    return new Promise((resolve, reject) => {
+  validatePSNId = async psnid =>
+    new Promise((resolve, reject) => {
       axios
         .post("https://servicewechat.gamepoch.com/api/verifyPsOnlineId", {
           onlineId: psnid,
@@ -346,7 +346,6 @@ class RegisterForm extends React.Component {
         .then(response => resolve(response.data))
         .catch(e => reject(e));
     });
-  };
 
   render() {
     const { classes } = this.props;
@@ -576,7 +575,7 @@ class RegisterForm extends React.Component {
             <div className={classes.padding4}>
               <img
                 className={classes.footerImage}
-                src="https://www.gamepoch.com/images/logo.png"
+                src="https://www.gamepoch.com/img/logo.png"
                 rel="noopener noreferrer"
                 alt=""
               />
