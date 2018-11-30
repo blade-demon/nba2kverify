@@ -21,3 +21,9 @@ body {
   bottom: 0;
   background-color: rgba(252, 252, 252, 0.8);
 }
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
