@@ -327,8 +327,8 @@ class RegisterForm extends React.Component {
               >
                 <Grid item>
                   <img
-                    src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/icons8-playstation-filled-50.png"
-                    style={{ width: "24px", height: "24px" }}
+                    src="/img/PS4.png"
+                    style={{ width: "25px", height: "25px" }}
                     alt="PS4 logo"
                   />
                 </Grid>

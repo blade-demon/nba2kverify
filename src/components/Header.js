@@ -30,9 +30,9 @@ function Header(props) {
         <Toolbar>
           <Typography variant="title" className={classes.flex}>
             <img
-              src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/nba2k19_logo_L_2.png"
+              src="/img/logo.png"
               style={{ width: "200px" }}
-              alt=""
+              alt="NBA2K19 logo"
             />
           </Typography>
           <Typography variant="title" align="right" style={{ float: "right" }}>

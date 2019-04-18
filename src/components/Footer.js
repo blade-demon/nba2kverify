@@ -80,7 +80,7 @@ function Footer(props) {
           <div className={classes.margin4}>
             <img
               className={classes.qrcode}
-              src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/gamepoch-wechat-qrcode.jpg"
+              src="/img/weixin.jpg"
               alt="微信二维码"
             />
             <h5 className={classes.small}>“Gamepoch星游纪”</h5>
@@ -89,7 +89,7 @@ function Footer(props) {
           <div className={classes.margin4}>
             <img
               className={classes.qrcode}
-              src="https://gamepochblobstorage.blob.core.windows.net/images/NBA2K19/gamepoch-weibo-qrcode.png"
+              src="/img/weibo.png"
               alt="微博二维码"
             />
             <h5 className={classes.small}>“Gamepoch星游纪”</h5>
